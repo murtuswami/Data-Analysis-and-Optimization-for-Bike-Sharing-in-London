@@ -117,11 +117,11 @@ with pd.option_context('display.max_rows', None, 'display.max_columns', None):  
     print(bikeStations)
 map = folium.Map(location = [51.5073219, -0.1276474], tiles='OpenStreetMap' , zoom_start = 13 )
 folium.TileLayer('cartodbdark_matter').add_to(map)
-marker_cluster = MarkerCluster(control=False).add_to(map)
+fg_supply = folium.FeatureGroup(name = "Supply", show = True)
+fg_demand = folium.FeatureGroup(name = "Demand", show = False)
+marker_cluster = MarkerCluster().add_to(fg_demand)
 
-map2 = folium.Map(location = [51.5073219, -0.1276474], tiles='OpenStreetMap' , zoom_start = 13 )
-folium.TileLayer('cartodbdark_matter').add_to(map2)
-marker_cluster2 = MarkerCluster(control=False).add_to(map2)
+marker_cluster2 = MarkerCluster().add_to(fg_supply)
 
 for x in bikeStations.index:
     print(bikeStations['lon'][x],bikeStations['lat'][x],bikeStations['demand'][x],bikeStations['id'][x])
@@ -136,23 +136,21 @@ for x in bikeStations.index:
          for _ in range(1,demand +1):
             folium.Marker(
             location=[bikeStations['lat'][x], bikeStations['lon'][x]],
-            popup=bikeStations['demand'][x]
-        ).add_to(marker_cluster2)
+            popup=bikeStations['demand'][x]).add_to(marker_cluster2)
         
     else:
          for _ in range(1,demand +1):
             folium.Marker(
             location=[bikeStations['lat'][x], bikeStations['lon'][x]],
-            popup=bikeStations['demand'][x]
-        ).add_to(marker_cluster)
+            popup=bikeStations['demand'][x]).add_to(marker_cluster)
 
-       
-   
+fg_demand.add_to(map)
+fg_supply.add_to(map)
+map.add_child(folium.LayerControl())
 
 
+map.save("weeklyClusterData.html")
 
-map.save("weeklyClusterDataMapDemand.html")
-map2.save("weeklyClusterDataMapSupply.html")
 
 
 
