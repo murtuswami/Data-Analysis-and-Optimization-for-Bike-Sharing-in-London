@@ -25,7 +25,7 @@ map.save("map_1.html")
 
 
 
-
+"""
 G = ox.graph_from_bbox(bdb[3], bdb[1], bdb[2], bdb[0],network_type='all') # Max y , min y , max x min x  , network_type='drive'
 fig, ax = ox.plot_graph(
     G,
@@ -38,3 +38,4 @@ fig, ax = ox.plot_graph(
 )
 bikeStations.plot(ax = ax,markersize =5, color = "blue", marker ="o",label="Bike Station")
 plt.show()
+"""

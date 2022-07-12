@@ -4,9 +4,10 @@ import glob
 import os 
 import numpy as np
 import pdb
+import geopandas as gpd
 import folium 
 from folium import plugins
-from folium.plugins import HeatMap,HeatMapWithTime
+from folium.plugins import HeatMap,HeatMapWithTime,MarkerCluster
 
 
 ##  Read data on bikestations  ## 
@@ -118,7 +119,7 @@ def minMaxScaling(series,min,max):
 print(min)
 print(max)
 
-
+"""
 ## Seperate into demand and supply ##
 def extractDemand(n):
     if n<0:
@@ -141,7 +142,6 @@ for x in supplyData:
      x['demand'] = x['demand'].map(lambda x: minMaxScaling(x,min = 0,max= max))
 
 
-
 print(heatDataFrames)
 print("--------------------------------------------------------------------------------")
 print(demandData)
@@ -149,6 +149,16 @@ print("-------------------------------------------------------------------------
 print(supplyData)
 
 ## Folium HeatMap Display 
+print(bikeStations)
+map = folium.Map(location = [51.5073219, -0.1276474], tiles='OpenStreetMap' , zoom_start = 13 )
+folium.TileLayer('cartodbdark_matter').add_to(map)
+marker_cluster = MarkerCluster(control=False).add_to(map)
+bikeStations['geocode'] = [[bikeStations['lat'][i],bikeStations['lng'][i]] for i in range(len(df)) ]
+folium.Marker(df['geocode']).add_to(marker_cluster)
+
+
+map.save("24hoursdemandmarkers.html")
+
 demandData = [x.values.tolist() for x in demandData]
 supplyData = [x.values.tolist() for x in supplyData]
 
@@ -182,3 +192,4 @@ map2.save("24hoursAvgSupplyMap.html")
 
 #Step through times hourly, starting from 0000 and ending at 2300. 
 #Adjust bike stations delta at each time step. 
+"""
