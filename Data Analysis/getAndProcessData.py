@@ -17,6 +17,9 @@ def getAndProcessData():
     def idGenerator(x):
         return x.split("_")[1]
     bikeStations.id = np.vectorize(idGenerator)(bikeStations.id)
+    bikeStations["demand"] = 0 
+
+
     folders =  [x[0] for x in os.walk(os.getcwd() + "/_TfL Cycling Data")]
     folders.pop(0)
     li = []
@@ -29,10 +32,10 @@ def getAndProcessData():
     trips = pd.concat(li, axis=0, ignore_index=True)
 
 
-    ## Bike Trip data manipulation 
+    ## Bike Trip data Wrangling  
     trips[['EndStation Id']] = trips[['EndStation Id']].fillna(value=-1) # Endstations have some empty values, fill with -1 
     trips['EndStation Id'] = trips['EndStation Id'].astype(np.int64)     # Cast as int as empty values default to float 
     trips[['End Date','Start Date']] = trips[['End Date','Start Date']].apply(lambda _: pd.to_datetime(_,format = "%d/%m/%Y %H:%M")) # Convert dates to datetime objects 
-    bikeStations["demand"] = 0 
+   
 
     return trips,bikeStations
