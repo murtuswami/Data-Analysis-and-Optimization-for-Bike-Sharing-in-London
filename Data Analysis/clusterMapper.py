@@ -13,7 +13,6 @@ def mapClusters(bikeStations,title):
     marker_cluster2 = MarkerCluster().add_to(fg_supply)
 
     for x in bikeStations.index:
-        print(bikeStations['lon'][x],bikeStations['lat'][x],bikeStations['demand'][x],bikeStations['id'][x])
         demand = bikeStations['demand'][x]
         supply = False
         if demand>0:
@@ -41,3 +40,4 @@ def mapClusters(bikeStations,title):
     fg_supply.add_to(map)
     map.add_child(folium.LayerControl())
     map.save(title+ ".html")
+    
