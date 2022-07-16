@@ -3,7 +3,7 @@ import getAndProcessData
 import processOverTime
 import clusterMapper
 import numpy as np
-
+import folium
 
 trips,bikeStations = getAndProcessData.getAndProcessData()
 
@@ -18,12 +18,9 @@ months = weeks /4
 days = weeks * 7 
 
 
-
 ## Add Demand column to bikestations frame ## 
-bikeStations = processOverTime.processTripsOverTime(trips,bikeStations,weeks,range(0,6),"W")
-clusterMapper.mapClusters(bikeStations,"weeklyCluster")
-
-
-
-
+bikeStations = processOverTime.processTripsOverTime(trips,bikeStations,days,range(1,25),"D")
+map = clusterMapper.mapClusters(bikeStations)
+map.add_child(folium.LayerControl())
+map.save("dailyCluster.html")
 

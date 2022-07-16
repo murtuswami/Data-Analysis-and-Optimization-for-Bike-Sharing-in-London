@@ -19,8 +19,7 @@ def processTripsOverTime(trips,bikeStations,av,range,t):
         endFrameCounts = endFrame['EndStation Id'].value_counts().to_frame()
         startFrame = trips[timeMaskStart]
         startFrameCounts = startFrame['StartStation Id'].value_counts().to_frame()
-        print(endFrame)
-        print(startFrame)
+       
     
         ##Average the counts over the number of days## 
         #print(endFrameCounts)

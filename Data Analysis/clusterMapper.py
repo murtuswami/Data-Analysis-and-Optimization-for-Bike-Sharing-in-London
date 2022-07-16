@@ -1,9 +1,9 @@
 import folium 
 from folium import plugins
-from folium.plugins import HeatMap,HeatMapWithTime,MarkerCluster
+from folium.plugins import MarkerCluster
 import math
 
-def mapClusters(bikeStations,title):
+def mapClusters(bikeStations):
    
     map = folium.Map(location = [51.5073219, -0.1276474], tiles='cartodbdark_matter' , zoom_start = 13 )
     #folium.TileLayer('cartodbdark_matter').add_to(map)
@@ -24,7 +24,7 @@ def mapClusters(bikeStations,title):
             for _ in range(1,demand +1):
                 folium.Marker(
                 location=[bikeStations['lat'][x], bikeStations['lon'][x]],
-                popup=bikeStations['demand'][x],
+                popup=bikeStations['id'][x],
                 icon=folium.Icon(color='green', prefix='fa',icon='bicycle')
                 ).add_to(marker_cluster2)
             
@@ -32,12 +32,16 @@ def mapClusters(bikeStations,title):
             for _ in range(1,demand +1):
                 folium.Marker(
                 location=[bikeStations['lat'][x], bikeStations['lon'][x]],
-                popup=bikeStations['demand'][x],
+                popup=bikeStations['id'][x],
                 icon=folium.Icon(color='red', prefix='fa',icon='bicycle')
                 ).add_to(marker_cluster)
 
     fg_demand.add_to(map)
     fg_supply.add_to(map)
-    map.add_child(folium.LayerControl())
-    map.save(title+ ".html")
+    
+    #map.add_child(folium.LayerControl())
+
+  
+    return map
+    
     
