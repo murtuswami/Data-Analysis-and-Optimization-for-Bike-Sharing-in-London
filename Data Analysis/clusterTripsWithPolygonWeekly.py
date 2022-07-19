@@ -22,7 +22,7 @@ weeks = diff(first,last)
 
 
 
-bikeStations = processOverTime.processTripsOverTime(trips,bikeStations,weeks,range(0,6),"W")
+bikeStations = processOverTime.processTripsOverTime(trips,bikeStations,weeks,range(0,7),"W")
 map = clusterMapper.mapClusters(bikeStations)
 formatter = "function(num) {return L.Util.formatNum(num, 3) + ' º ';};"
 MousePosition(
