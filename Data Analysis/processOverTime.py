@@ -45,6 +45,7 @@ def processTripsOverTime(trips,bikeStations,av,range,t):
         bikeStations['StartStation Id'] = bikeStations['StartStation Id'].fillna(0)
         bikeStations['demand'] += bikeStations['StartStation Id']                                           #Same for startstationid but instead add to demand since bikes are leaving 
         bikeStations = bikeStations.drop('StartStation Id',1)
+   
     return bikeStations
 
      
