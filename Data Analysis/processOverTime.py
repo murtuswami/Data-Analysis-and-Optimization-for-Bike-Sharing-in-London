@@ -20,7 +20,7 @@ def processTripsOverTime(trips,bikeStations,av,range,t):
         startFrame = trips[timeMaskStart]
         startFrameCounts = startFrame['StartStation Id'].value_counts().to_frame()
        
-    
+        print()
         ##Average the counts over the number of days## 
         #print(endFrameCounts)
         endFrameCounts['EndStation Id'] = average(endFrameCounts['EndStation Id'],av )
@@ -37,6 +37,7 @@ def processTripsOverTime(trips,bikeStations,av,range,t):
         #First Merge ending occurences, use left to ignore invalid ids( -1 ) this creates a column called 'endstation id' in bikestations 
         # which is the number of bikes ending at a locations
         # For columns with no endstations, set the count to 0 using fillna
+
         bikeStations= pd.merge(bikeStations, endFrameCounts, how='left', left_on='id',right_index= True)   
         bikeStations['EndStation Id'] = bikeStations['EndStation Id'].fillna(0)
         bikeStations['demand'] -= bikeStations['EndStation Id']                                             #Minus demand from number of bikes ending as it creates a surplus 

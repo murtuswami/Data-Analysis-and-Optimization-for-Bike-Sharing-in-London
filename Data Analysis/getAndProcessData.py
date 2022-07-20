@@ -36,6 +36,8 @@ def getAndProcessData():
     trips[['EndStation Id']] = trips[['EndStation Id']].fillna(value=-1) # Endstations have some empty values, fill with -1 
     trips['EndStation Id'] = trips['EndStation Id'].astype(np.int64)     # Cast as int as empty values default to float 
     trips[['End Date','Start Date']] = trips[['End Date','Start Date']].apply(lambda _: pd.to_datetime(_,format = "%d/%m/%Y %H:%M")) # Convert dates to datetime objects 
-   
-
+    print(trips.shape[0])
+    trips  = trips[trips['StartStation Id'].isin(bikeStations.index)]
+    trips  = trips[trips['EndStation Id'].isin(bikeStations.index)]
+    print(trips.shape[0])
     return trips,bikeStations
