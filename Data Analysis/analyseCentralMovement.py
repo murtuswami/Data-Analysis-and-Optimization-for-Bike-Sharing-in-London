@@ -104,7 +104,7 @@ print(tripsEndingInPoly)
 print(tripsStartingInPoly)
 print(demandInPolyAtTime)
 
-
+    
 
 
 tripsEndingInPoly = np.array(tripsEndingInPoly)
