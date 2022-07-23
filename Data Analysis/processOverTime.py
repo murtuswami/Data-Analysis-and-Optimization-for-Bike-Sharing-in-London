@@ -20,11 +20,11 @@ def processTripsOverTime(trips,bikeStations,av,range,t):
         startFrame = trips[timeMaskStart]
         startFrameCounts = startFrame['StartStation Id'].value_counts().to_frame()
        
-        print()
+     
         ##Average the counts over the number of days## 
         #print(endFrameCounts)
-        endFrameCounts['EndStation Id'] = average(endFrameCounts['EndStation Id'],av )
-        startFrameCounts['StartStation Id'] = average(startFrameCounts['StartStation Id'],av)
+        # endFrameCounts['EndStation Id'] = average(endFrameCounts['EndStation Id'],av )
+        # startFrameCounts['StartStation Id'] = average(startFrameCounts['StartStation Id'],av)
         #print(endFrameCounts)
         ## Data Wrangling 
         # Map index types to string for merge operation and reduce to just counts 
@@ -46,7 +46,10 @@ def processTripsOverTime(trips,bikeStations,av,range,t):
         bikeStations['StartStation Id'] = bikeStations['StartStation Id'].fillna(0)
         bikeStations['demand'] += bikeStations['StartStation Id']                                           #Same for startstationid but instead add to demand since bikes are leaving 
         bikeStations = bikeStations.drop('StartStation Id',1)
-   
+    # endFrameCounts['EndStation Id'] = average(endFrameCounts['EndStation Id'],av )
+     # startFrameCounts['StartStation Id'] = average(startFrameCounts['StartStation Id'],av)
+    bikeStations['demand'] = average(bikeStations['demand'],av)
+
     return bikeStations
 
      

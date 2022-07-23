@@ -40,6 +40,6 @@ plt.xticks([i for i in range(0,24)])
 
 plt.show()
 plt.clf()
-sns.lineplot(x="Hour",y="Demand",data = demandFrame).set(title="Cumulative Demand in Polygon ")
+sns.lineplot(x="Hour",y="Demand",data = demandFrame).set(title="Cumulative Demand in Polygon")
 plt.xticks([i for i in range(0,24)])
 plt.show()
