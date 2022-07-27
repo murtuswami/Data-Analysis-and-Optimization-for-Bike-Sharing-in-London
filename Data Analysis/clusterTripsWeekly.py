@@ -22,6 +22,7 @@ days = weeks * 7
 
 ## Add Demand column to bikestations frame ## 
 bikeStations = processOverTime.processTripsOverTime(trips,bikeStations,weeks,range(0,7),"W")
+bikeStations.to_pickle("bikestationswithweeklydemand.pkl")
 map= clusterMapper.mapClusters(bikeStations)
 map.add_child(folium.LayerControl())
 map.save("weeklyCluster.html")
