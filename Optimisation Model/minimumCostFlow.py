@@ -1,42 +1,48 @@
 import math
-from processOverTime import processTripsOverTime
+
 from getAndProcessData import getAndProcessData
+from processOverDay import processTripsOverTime
 import pandas as pd 
 import numpy as np
 import geopandas as gpd
 import pyproj 
-from math import radians, cos, sin, asin, sqrt
+from minCostFlowSolver import MinCostFlow
+import pdb
+
+
+
 
 """
 trips,bikeStations = getAndProcessData()
-
-## Duration Calculations ## 
-first = trips["Start Date"].min()
-last = trips["Start Date"].max()
-def diff(start, end):
-    x = pd.to_datetime(end) - pd.to_datetime(start)
-    return int(x / np.timedelta64(1, 'W'))
-weeks = diff(first,last)
-months = weeks /4
-days = weeks * 7 
-
-bikeStations = processTripsOverTime(trips,bikeStations,weeks,range(0,7),"W")
 bikeStations.to_pickle("bikestations.pkl")
 
 """
 
-print()
-bikeStations = pd.read_pickle("bikestations.pkl")
+
+bikeStations = pd.read_pickle("bikestationsraw.pkl")
+bikeStations['demand'] = 0 
+trips = pd.read_pickle("trips.pkl")
+print(trips)
+print(bikeStations)
+print(trips['Start Date'].min ())
+bikeStations = processTripsOverTime(trips,bikeStations,trips['Start Date'].min())
+print(bikeStations)
+
 bikeStations = gpd.GeoDataFrame(bikeStations,crs="EPSG:4326",geometry=gpd.points_from_xy(bikeStations.lon, bikeStations.lat) )
 bikeStations = bikeStations.to_crs(crs = pyproj.CRS("EPSG:27700"))
 supply = bikeStations[ bikeStations['demand'] <0]
 demand = bikeStations [ bikeStations['demand'] > 0]
+
 startEdge = []
 startGeo = [] 
 endEdge = [] 
 endGeo = []
-print(supply)
-print(demand)
+
+demand['demand'] = demand.apply(lambda x : math.ceil(x['demand']),axis = 1 )
+supply['demand'] = supply.apply(lambda x : math.floor(x['demand']),axis = 1 )
+print(supply['demand'].sum())
+print(demand['demand'].sum())
+pdb.set_trace()
 
 def reassignId(x,row):
     x = (x,row)
@@ -60,12 +66,14 @@ distances = x.distance(y,align=False)
 edges['weight'] = distances
 edges =  edges.drop("startPoint", axis=1)
 edges = edges.drop("endPoint", axis=1)
+edges['capacity'] = 1
 print(edges)
 
 
 sourceEnds = []
 sourceStarts = [-1 for x in range(0,len(supply))]
 sourceDistances = [0 for x in range(0,len(supply))] 
+#sourceCap = [ 2 for x ]
 for index,row in supply.iterrows():
     sourceEnds.append(row['id'])
 d = {'edgeStart':sourceStarts,'edgeEnd':sourceEnds,'weight':sourceDistances}
@@ -82,8 +90,36 @@ for index,row in demand.iterrows():
 
 d = {'edgeStart':sinkStarts,'edgeEnd':sinkEnds,'weight':sinkDistances}
 
-
 sinkEdges = pd.DataFrame(data = d)
 
 edges = pd.concat([sinkEdges,edges])
+
+
+
 print(edges)
+nodes = pd.concat([demand,supply])
+print(demand)
+
+idSet = nodes['id'].to_list()
+demandSet = nodes['demand'].to_list()
+net = []
+for x in idSet:
+    if x == -1:
+        net.append(len(demand))
+    if x == -2:
+        net.append(-len(demand))
+print(idSet)
+print(demandSet)
+
+
+edgeId = []
+edgeWeight = []
+edgeCap = [] 
+
+for index,row in edges.iterrows():
+    edgeId.append((row['edgeStart'],row['edgeEnd']))
+    edgeWeight.append(row['weight'])
+    edgeCap.append(row['capacity'])
+print(edgeId)
+print(edgeWeight)
+print(edgeCap)
