@@ -22,11 +22,10 @@ bikeStations.to_pickle("bikestations.pkl")
 bikeStations = pd.read_pickle("bikestationsraw.pkl")
 bikeStations['demand'] = 0 
 trips = pd.read_pickle("trips.pkl")
-print(trips)
-print(bikeStations)
+
 print(trips['Start Date'].min ())
 bikeStations = processTripsOverTime(trips,bikeStations,trips['Start Date'].min())
-print(bikeStations)
+
 
 bikeStations = gpd.GeoDataFrame(bikeStations,crs="EPSG:4326",geometry=gpd.points_from_xy(bikeStations.lon, bikeStations.lat) )
 bikeStations = bikeStations.to_crs(crs = pyproj.CRS("EPSG:27700"))
@@ -57,7 +56,7 @@ for index , row in supply.iterrows():
 
 
 #edgeids in form supply, demand 
-d = {'edgeStart' : startEdge,'startPoint': gpd.GeoSeries(startGeo),'edgeEnd' :endEdge,'endPoint':gpd.GeoSeries(endGeo),'cap':capacity}
+d = {'edgeStart' : startEdge,'startPoint': gpd.GeoSeries(startGeo),'edgeEnd' :endEdge,'endPoint':gpd.GeoSeries(endGeo),'capacity':capacity}
 edges = pd.DataFrame(data=d)
 x =   gpd.GeoSeries(edges['startPoint'],crs=pyproj.CRS("EPSG:27700"))
 y = gpd.GeoSeries(edges['endPoint'],crs= pyproj.CRS("EPSG:27700"))
@@ -66,7 +65,7 @@ edges['weight'] = distances
 edges =  edges.drop("startPoint", axis=1)
 edges = edges.drop("endPoint", axis=1)
 
-print(edges)
+
 
 
 sourceEnds = []
@@ -75,15 +74,14 @@ sourceDistances = [0 for x in range(0,len(supply))]
 
 sourceCap = []
 bikeStations = bikeStations.set_index('id')
-print(bikeStations)
+
 for index,row in supply.iterrows():
-    print(row['id'],row['demand'])
+  
     sourceEnds.append(row['id'])
     sourceCap.append(abs(row['demand']))
-print(sourceCap)
-print(supply)
 
-d = {'edgeStart':sourceStarts,'edgeEnd':sourceEnds,'weight':sourceDistances,'cap':sourceCap}
+
+d = {'edgeStart':sourceStarts,'edgeEnd':sourceEnds,'weight':sourceDistances,'capacity':sourceCap}
 sourceEdges = pd.DataFrame(data = d )
 edges = pd.concat([sourceEdges,edges])
 
@@ -94,9 +92,8 @@ sinkCap = []
 for index,row in demand.iterrows():
     sinkStarts.append(row['id'])
     sinkCap.append(row['demand'])
-print(sinkCap)
- 
-d = {'edgeStart':sinkStarts,'edgeEnd':sinkEnds,'weight':sinkDistances,'cap':sinkCap}
+
+d = {'edgeStart':sinkStarts,'edgeEnd':sinkEnds,'weight':sinkDistances,'capacity':sinkCap}
 
 sinkEdges = pd.DataFrame(data = d)
 
@@ -104,19 +101,31 @@ edges = pd.concat([sinkEdges,edges])
 
 
 
-print(edges)
 nodes = pd.concat([demand,supply])
-idSet = nodes['id'].to_list()
-print(idSet)
+nodes = nodes.set_index('id')
+nodes['imbalance']= 0
+nodes = nodes['imbalance'].to_frame()
 
-edgeId = []
-edgeWeight = []
-edgeCap = [] 
 
+nodes.loc[-1] = [abs(supply['demand'].sum())]
+nodes.loc[-2] = [-demand['demand'].sum()]
+
+
+edges = edges.set_index(['edgeStart','edgeEnd'])
+print(nodes)
+print(edges)
+
+    
+"""
 for index,row in edges.iterrows():
     edgeId.append((row['edgeStart'],row['edgeEnd']))
     edgeWeight.append(row['weight'])
     edgeCap.append(row['cap'])
-print(edgeId)
-print(edgeWeight)
-print(edgeCap)
+
+
+
+
+nodes is a dataframe containing id as index and imbalance as column 
+edges are a dataframe containing [start,end] as index with weights and capacities
+    
+"""
