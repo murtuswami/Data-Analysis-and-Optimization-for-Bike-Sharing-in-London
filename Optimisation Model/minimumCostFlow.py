@@ -8,9 +8,10 @@ import geopandas as gpd
 import pyproj 
 from minCostFlowSolver import MinCostFlow
 import pdb
-
-
-
+from pyomo.environ import value
+from FeasibleFlowModel import FeasibleFlow
+from TSPOR import TSPORSolver
+import pickle
 
 """
 trips,bikeStations = getAndProcessData()
@@ -37,8 +38,7 @@ startGeo = []
 endEdge = [] 
 endGeo = []
 capacity = [] 
-#demand['demand'] = demand.apply(lambda x : math.ceil(x['demand']),axis = 1 )
-#supply['demand'] = supply.apply(lambda x : math.floor(x['demand']),axis = 1 )
+
 print(supply['demand'].sum())
 print(demand['demand'].sum())
 
@@ -65,9 +65,10 @@ edges['weight'] = distances
 edges =  edges.drop("startPoint", axis=1)
 edges = edges.drop("endPoint", axis=1)
 
+edgesWithoutSourceSink = edges.copy()
 
 
-
+distances
 sourceEnds = []
 sourceStarts = [-1 for x in range(0,len(supply))]
 sourceDistances = [0 for x in range(0,len(supply))] 
@@ -102,30 +103,62 @@ edges = pd.concat([sinkEdges,edges])
 
 
 nodes = pd.concat([demand,supply])
+nodes['id'] = nodes['id'].astype(np.unicode_)
 nodes = nodes.set_index('id')
+
 nodes['imbalance']= 0
 nodes = nodes['imbalance'].to_frame()
 
 
-nodes.loc[-1] = [abs(supply['demand'].sum())]
-nodes.loc[-2] = [-demand['demand'].sum()]
+nodes.loc["-1"] = [abs(supply['demand'].sum())]
+nodes.loc["-2"] = [-demand['demand'].sum()]
 
 
+print(edges)
+edges['edgeStart'] = edges['edgeStart'].astype(np.unicode_)
+edges['edgeEnd'] = edges['edgeEnd'].astype(np.unicode_)    
 edges = edges.set_index(['edgeStart','edgeEnd'])
 print(nodes)
 print(edges)
 
-    
+
+
+
+
+ 
+
+
+solver = FeasibleFlow(nodes,edges)
+solver.makeModel()
+results,model = solver.solve()
+keyEdges = {}
+for v in model.X:
+    if model.X[v].value !=0 and v[0] != "-1" and v[1] != "-2":
+       keyEdges.update({( str(v[0]), str(v[1]) ):int(edges.loc[v]['weight'])})
+print(keyEdges)
+edgesDict = {}
+for x in edges.iterrows():
+   edgesDict.update({ (str(x[0][0]) ,str(x[0][1])):int(round(x[1]['weight']))})
+
+print(edgesDict)
+print(keyEdges)
+
+with open('edgesDict.p', 'wb') as fp:
+    pickle.dump(edgesDict, fp, protocol=pickle.HIGHEST_PROTOCOL)
+with open('keyEdgesDict.p','wb') as fp:
+    pickle.dump(keyEdges, fp, protocol=pickle.HIGHEST_PROTOCOL)
+#TSPSolver = TSPORSolver(keyEdges,edgesDict)
+#TSPSolver.solve()
+
 """
-for index,row in edges.iterrows():
-    edgeId.append((row['edgeStart'],row['edgeEnd']))
-    edgeWeight.append(row['weight'])
-    edgeCap.append(row['cap'])
 
 
+solver = MinCostFlow(nodesDF=nodes.copy(),edgesDF=edges.copy())
+solver.makeModel()
+results,model = solver.solve()
+print(results,model)
+print(value(model.Obj))
+model.display()
 
-
-nodes is a dataframe containing id as index and imbalance as column 
-edges are a dataframe containing [start,end] as index with weights and capacities
-    
 """
+  

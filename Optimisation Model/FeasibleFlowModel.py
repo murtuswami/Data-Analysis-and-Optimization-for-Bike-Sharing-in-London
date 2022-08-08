@@ -6,15 +6,8 @@ import pdb
 from pyomo.environ import value
 
 
-class MinCostFlow:
-    """
-    nodes is a dataframe containing id as index and imbalance as column 
-    edges are a dataframe containing [start,end] as index with weights and capacities
-    Code was adapted from the following : 
+class FeasibleFlow:
 
-
-    https://github.com/Pyomo/PyomoGallery/blob/master/pandas_min_cost_flow/min_cost_flow.py
-    """
     def __init__(self,nodesDF,edgesDF):
         self.edge_data = edgesDF
         self.node_data = nodesDF
@@ -23,48 +16,37 @@ class MinCostFlow:
     
     def makeModel(self):
         self.m = pyo.ConcreteModel()
-
         self.m.node_set = pyo.Set(initialize = self.node_set)
         self.m.edge_set = pyo.Set(initialize = self.edge_set,dimen = 2 )
-        #Make rule that we cant send flow along an edge unless its X value is true 
-
-        self.m.X = pyo.Var(self.m.edge_set,domain=pyo.NonNegativeReals) 
-        self.m.Y = pyo.Var(self.m.edge_set,within = pyo.Binary )
-      
-        #Objective rule 
         
+        self.m.X = pyo.Var(self.m.edge_set,domain=pyo.NonNegativeReals) # change to integer value 
         def obj_rule(m):
-            
-            
-            return sum( m.Y[e]* self.edge_data.loc[e]['weight'] for e in self.edge_set) 
+            return sum( m.X[e]* self.edge_data.loc[e]['weight'] for e in self.edge_set) 
+            # Solve TSP on result from this network using a nearest neighbour heuristic 
+            # Minimum tour length of this network is solution to thisproblem 
+            # What happens if transportation van has capacity 50
+            # How to make it run better 
+            # Cost function in network flow problem
+            # Actual TSP Algorithm 
+            # incorporate the extra edges into routing 
+            # test different variants of the cost function for the minimum cost flow problem 
+            # Vehicle rotuing with multiple vehicles 
+            # How the number of vehicles saves times km/h
+            # Minimize total maximum travelled by any particular vehicle 
+            # Plot pareto front horizontal axis is number of vehicles 
+            # As you increase the number of vehicles, the total time decreases 
+            # Start arbitary node but be aware it may affect cost 
         self.m.Obj = pyo.Objective(rule = obj_rule,sense = pyo.minimize)
-      
-        #Flow Conservation 
        
         def flow_conservation(m,n): # m is model, n is node id that we are conserving flow 
             edges = self.edge_data.reset_index()
-          
             incoming = edges[edges['edgeEnd'] ==n ]
             outgoing = edges[edges['edgeStart'] == n]
-           
-           
             return sum(m.X[(n,s[1]['edgeEnd'])] for s in outgoing.iterrows() ) - sum(m.X[(p[1]['edgeStart'],n)] for p in incoming.iterrows())    == self.node_data.loc[n]['imbalance']
         self.m.FlowCons = pyo.Constraint(self.m.node_set,rule = flow_conservation)
-       
-        
-        def flow_along_active_edge(m,n,p):
-            # flow, X must be greater than or equal to than Y which decides whether the edge is active 
-            # lets say edge is not active, so Y = 0. We sent 1 unit of flow, so it wont work 
-            # lets say edge is active. Y = 1. minimum flow is 1. So  X>=Y it will send 
-            # Y is binart 01 , x is flow, 
-
-            return m.X[n,p] <= self.edge_data.loc[n,p]['capacity'] * m.Y[n,p]
-        self.m.activeEdges = pyo.Constraint(self.m.edge_set,rule=flow_along_active_edge)
         
         def capacity_constraints(m,n,p):
-        
             return (0,m.X[n,p],self.edge_data.loc[n,p]['capacity'])
-            
         self.m.capContraints = pyo.Constraint(self.m.edge_set,rule =capacity_constraints)
         
     def solve(self):
@@ -72,15 +54,3 @@ class MinCostFlow:
         results = solver.solve(self.m, tee=True, keepfiles=False)
         return results ,self.m
         
-
-"""
-
-If I am interpreting this correctly, I would suggest turning this around:
-
- if use=0 then flow=0
- else flow is unrestricted
-This can be modeled as:
-
- flow <= cap*use
-
-"""
