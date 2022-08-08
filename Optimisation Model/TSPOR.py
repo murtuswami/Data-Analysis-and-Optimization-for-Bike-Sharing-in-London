@@ -76,7 +76,7 @@ class TSPORSolver:
         route_distance -= previous_arc_dist + self.edges.get((self.locations[previous_index][0],self.locations[previous_index][1]))
         plan_output += 'Distance of the route: {}m\n'.format(route_distance)
         print(plan_output)
-     
+        
         return route_distance,route_array
        
         

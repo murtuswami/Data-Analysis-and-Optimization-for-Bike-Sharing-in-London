@@ -2,7 +2,7 @@
 import pandas as pd
 import pdb
 import numpy as np
-def processTripsOverTime(trips,bikeStations,date):
+def processTripsOverDate(trips,bikeStations,date):
     bikeStations = bikeStations.copy()
     trips = trips.copy()
     dateMask = (trips['Start Date'].dt.year == date.year) & (trips['Start Date'].dt.month == date.month) & (trips['End Date'].dt.day == date.day)
