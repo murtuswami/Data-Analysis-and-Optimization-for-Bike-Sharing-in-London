@@ -34,7 +34,9 @@ def diff(start, end):
     x = pd.to_datetime(end) - pd.to_datetime(start)
     return int(x / np.timedelta64(1, 'W'))
 weeks = diff(first,last)
-print(weeks)
+
+range = range(0,24)
+av = weeks*7
 
 #remove trips which start or end at stations for which we have no data 
 
@@ -92,7 +94,7 @@ for i in range:
     bikeStations['demand'] -= bikeStations['EndStation Id']                                             #Minus demand from number of bikes ending as it creates a surplus 
     bikeStations = bikeStations.drop('EndStation Id',1)       
     
-                                                                                                    # Drop the counts once combined with endstationid 
+                                                                                                   # Drop the counts once combined with endstationid 
     bikeStations= pd.merge(bikeStations, startFrameCounts, how='left',left_index=True, right_index= True)
     bikeStations['StartStation Id'] = bikeStations['StartStation Id'].fillna(0)
     bikeStations['demand'] += bikeStations['StartStation Id']                                           #Same for startstationid but instead add to demand since bikes are leaving 

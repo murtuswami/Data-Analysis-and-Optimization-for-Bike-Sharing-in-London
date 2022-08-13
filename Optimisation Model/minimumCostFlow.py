@@ -59,7 +59,7 @@ for i in unq:
 
     d = {'edgeStart' : startEdge,'startPoint': gpd.GeoSeries(startGeo),'edgeEnd' :endEdge,'endPoint':gpd.GeoSeries(endGeo),'capacity':capacity}
     edges = pd.DataFrame(data=d)
-    x =   gpd.GeoSeries(edges['startPoint'],crs=pyproj.CRS("EPSG:27700"))
+    x =  gpd.GeoSeries(edges['startPoint'],crs=pyproj.CRS("EPSG:27700"))
     y = gpd.GeoSeries(edges['endPoint'],crs= pyproj.CRS("EPSG:27700"))
     distances = x.distance(y,align=False)
     edges['weight'] = distances

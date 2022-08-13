@@ -28,7 +28,7 @@ tripsStartingInPoly = pd.DataFrame({"Hour":hours, "Trips Starting In Poly":trips
 tripsFrame = pd.melt(tripsFrame, ['Hour'])
 tripsFrame.rename(columns = {'variable' : 'Trip Type', 'value' : 'Trips'}, inplace = True)
 
-print(tripsFrame)
+
 sns.set_theme()
 sns.set_context("paper")
 
