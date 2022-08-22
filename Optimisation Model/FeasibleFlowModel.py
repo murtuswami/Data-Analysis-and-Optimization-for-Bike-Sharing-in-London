@@ -2,7 +2,7 @@ import pyomo
 import pandas
 import pyomo.opt
 import pyomo.environ as pyo
-import pdb
+
 from pyomo.environ import value
 
 
@@ -22,22 +22,8 @@ class FeasibleFlow:
         self.m.X = pyo.Var(self.m.edge_set,domain=pyo.NonNegativeReals) # change to integer value 
         def obj_rule(m):
             return sum( m.X[e]* self.edge_data.loc[e]['weight'] for e in self.edge_set) 
-            # Solve TSP on result from this network using a nearest neighbour heuristic 
-            # Minimum tour length of this network is solution to thisproblem 
-            # What happens if transportation van has capacity 50
-            # How to make it run better 
-            # Cost function in network flow problem
-            # Actual TSP Algorithm 
-            # incorporate the extra edges into routing 
-            # test different variants of the cost function for the minimum cost flow problem 
-            # Vehicle rotuing with multiple vehicles 
-            # How the number of vehicles saves times km/h
-            # Minimize total maximum travelled by any particular vehicle 
-            # Plot pareto front horizontal axis is number of vehicles 
-            # As you increase the number of vehicles, the total time decreases 
-            # Start arbitary node but be aware it may affect cost 
+            
         self.m.Obj = pyo.Objective(rule = obj_rule,sense = pyo.minimize)
-       
         def flow_conservation(m,n): # m is model, n is node id that we are conserving flow 
             edges = self.edge_data.reset_index()
             incoming = edges[edges['edgeEnd'] ==n ]
